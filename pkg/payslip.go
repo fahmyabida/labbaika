@@ -44,11 +44,11 @@ func (p *Payslip) ConvertPayslipCsvToDocxfunc(c echo.Context) error {
 
 	newFileName := creatingNewDocx(lines, file.Filename)
 	go func() {
-		time.Sleep(10 * time.Second)
+		time.Sleep(5 * time.Second)
 		os.Remove(newFileName)
 		os.Remove(file.Filename)
 	}()
-	return c.File(newFileName)
+	return c.Attachment(newFileName, newFileName)
 }
 
 func creatingNewDocx(lines [][]string, fileName string) (newFileName string) {

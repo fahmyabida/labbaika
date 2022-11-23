@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/echo/v4"
 	"github.com/spf13/cobra"
 )
@@ -16,6 +17,13 @@ var restServer = &cobra.Command{
 
 func RunRestServer(cmd *cobra.Command, args []string) {
 	e := echo.New()
+	
+	e.Use(middleware.Logger())
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"*"},
+		AllowHeaders: []string{"*"},
+	  }))
+
 	e.POST("/payslips/convert", payslip.ConvertPayslipCsvToDocxfunc)
 	e.Logger.Fatal(e.Start(":8686"))
 }
