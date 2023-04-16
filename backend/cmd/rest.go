@@ -25,7 +25,7 @@ func RunRestServer(cmd *cobra.Command, args []string) {
 	  }))
 
 	e.POST("/payslips/convert", payslip.ConvertPayslipCsvToDocxfunc)
-	e.Logger.Fatal(e.Start(":8686"))
+	e.Logger.Fatal(e.Start(":8080"))
 }
 
 func Execute() {
