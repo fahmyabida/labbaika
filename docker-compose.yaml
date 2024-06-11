@@ -1,25 +1,77 @@
 version: "3.7"
 
 services:
-  backend:
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: labbaika
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks: [ "labbaika" ]
+  
+  menu-svc:
+    container_name: menu-svc
     build:
       context: .
-      dockerfile: dockerfile.BE
-    container_name: backend
-    ports:
-      - 8080:8080
-    # env_file:
-    #   - ./backend/.env
-    # volumes:
-    #   - ./:/app
+      dockerfile: dockerfile.backend
+    ports: [ 8080:8080 ]
+    volumes:
+      - ./docs:/root/docs
+    environment:
+      APP_ENV: production
+      PG_HOST: postgres
+      PG_PORT: 5432
+      PG_USER: postgres
+      PG_PASSWORD: postgres
+      PG_DATABASE: labbaika
+      PG_RO_HOST: postgres
+      PG_RO_PORT: 5432
+      PG_RO_USER: postgres
+      PG_RO_PASSWORD: postgres
+      PG_RO_DATABASE: labbaika
+    depends_on:
+      - postgres
+    command: [ "./labbaika", "menu-svc" ]
+    networks: [ "labbaika" ]
+
+  payslip-svc:
+    container_name: payslip-svc
+    build:
+      context: .
+      dockerfile: dockerfile.backend
+    ports: [ 8080:8080 ]
+    volumes:
+      - ./docs:/root/docs
+    environment:
+      APP_ENV: production
+      PG_HOST: postgres
+      PG_PORT: 5432
+      PG_USER: postgres
+      PG_PASSWORD: postgres
+      PG_DATABASE: labbaika
+      PG_RO_HOST: postgres
+      PG_RO_PORT: 5432
+      PG_RO_USER: postgres
+      PG_RO_PASSWORD: postgres
+      PG_RO_DATABASE: labbaika
+    depends_on:
+      - postgres
+    command: [ "./labbaika", "payslip-svc" ]
+    networks: [ "labbaika" ]
+
   frontend:
     build:
       context: .
-      dockerfile: dockerfile.FE
+      dockerfile: dockerfile.frontend
     container_name: frontend
+    environment:
+      APP_ENV: production
     ports:
       - 3000:3000
-    # env_file:
-    #   - ./frontend/.env
-    # volumes:
-    #   - ./:/app
+    networks: [ "labbaika" ]

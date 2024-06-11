@@ -2,12 +2,16 @@ package app
 
 import (
 	"fmt"
+	"log"
 	"os"
 
+	"github.com/fahmyabida/labbaika/cmd/config"
 	"github.com/fahmyabida/labbaika/internal/app/domain"
+	"github.com/fahmyabida/labbaika/internal/app/repository"
 	"github.com/fahmyabida/labbaika/internal/app/usecase"
 	"github.com/fahmyabida/labbaika/internal/logger"
 	"github.com/spf13/cobra"
+	"gorm.io/gorm"
 )
 
 var (
@@ -25,16 +29,36 @@ func Execute() {
 }
 
 var (
+	database *gorm.DB
+
+	MenuRepository domain.IMenuRepo
+
 	PayslipUsecase domain.IPayslipUsecase
+	MenuUsecase    domain.IMenuUsecase
 )
 
 func init() {
 	initLogger()
-	initApp()
+	if err := config.InitEnv(); err != nil {
+		log.Fatal(err)
+	}
+
+	cobra.OnInitialize(func() {
+		initDatabase()
+		initApp()
+	})
 }
 
 func initApp() {
+	MenuRepository = repository.NewMenuRepository(database)
+
 	PayslipUsecase = usecase.NewPayslipUsecase()
+	MenuUsecase = usecase.NewMenuUsecase(MenuRepository)
+}
+
+func initDatabase() {
+	rw, ro := config.LoadForPostgres()
+	database = config.InitDB(rw, ro)
 }
 
 func initLogger() {
