@@ -6,7 +6,7 @@ export async function UploadPayslipCsv(file: any)  {
     formData.append("file", file);
     var result : any
     try {
-        result = await axios.post(`${PAYSLIP_SERVICE_URL}/payslips/convert`, formData, {
+        result = await axios.post(`${PAYSLIP_SERVICE_URL}/api/v1/payslips/convert`, formData, {
             responseType: 'blob',
             headers: {
                 'Content-Type': 'multipart/form-data',
