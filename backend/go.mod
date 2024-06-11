@@ -1,4 +1,4 @@
-module github.com/fahmyabida/labbaika-payslip
+module github.com/fahmyabida/labbaika
 
 go 1.20
 

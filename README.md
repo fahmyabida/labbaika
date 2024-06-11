@@ -1,3 +1,3 @@
-# labbaika-payslip
+# labbaika
 
 ```go run main.go rest```

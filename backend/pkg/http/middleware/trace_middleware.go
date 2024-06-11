@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/fahmyabida/labbaika-payslip/internal/logger"
+	"github.com/fahmyabida/labbaika/internal/logger"
 	"github.com/labstack/echo/v4"
 )
 

@@ -5,8 +5,8 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/spf13/cobra"
 
-	httpHandler "github.com/fahmyabida/labbaika-payslip/pkg/http/handler"
-	customMiddleware "github.com/fahmyabida/labbaika-payslip/pkg/http/middleware"
+	httpHandler "github.com/fahmyabida/labbaika/pkg/http/handler"
+	customMiddleware "github.com/fahmyabida/labbaika/pkg/http/middleware"
 )
 
 var payslipSvc = &cobra.Command{

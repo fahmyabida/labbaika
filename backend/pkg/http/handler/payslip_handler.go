@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"github.com/fahmyabida/labbaika-payslip/internal/app/domain"
-	pkgErrors "github.com/fahmyabida/labbaika-payslip/pkg/errors"
+	"github.com/fahmyabida/labbaika/internal/app/domain"
+	pkgErrors "github.com/fahmyabida/labbaika/pkg/errors"
 	"github.com/labstack/echo/v4"
 )
 

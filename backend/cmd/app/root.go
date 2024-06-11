@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/fahmyabida/labbaika-payslip/internal/app/domain"
-	"github.com/fahmyabida/labbaika-payslip/internal/app/usecase"
-	"github.com/fahmyabida/labbaika-payslip/internal/logger"
+	"github.com/fahmyabida/labbaika/internal/app/domain"
+	"github.com/fahmyabida/labbaika/internal/app/usecase"
+	"github.com/fahmyabida/labbaika/internal/logger"
 	"github.com/spf13/cobra"
 )
 

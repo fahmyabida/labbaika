@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/fahmyabida/labbaika-payslip/internal/logger"
-	errors "github.com/fahmyabida/labbaika-payslip/pkg/errors"
+	"github.com/fahmyabida/labbaika/internal/logger"
+	errors "github.com/fahmyabida/labbaika/pkg/errors"
 	"github.com/labstack/echo/v4"
 )
 
