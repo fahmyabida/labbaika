@@ -31,10 +31,14 @@ func Execute() {
 var (
 	database *gorm.DB
 
-	MenuRepository domain.IMenuRepo
+	// repository
+	LedgerRepository domain.ILedgerRepo
+	MenuRepository   domain.IMenuRepo
 
-	PayslipUsecase domain.IPayslipUsecase
+	// usecase
+	LedgerUsecase  domain.ILedgerUsecase
 	MenuUsecase    domain.IMenuUsecase
+	PayslipUsecase domain.IPayslipUsecase
 )
 
 func init() {
@@ -44,7 +48,7 @@ func init() {
 	}
 
 	cobra.OnInitialize(func() {
-		initDatabase()
+		// initDatabase()
 		initApp()
 	})
 }
@@ -52,8 +56,9 @@ func init() {
 func initApp() {
 	MenuRepository = repository.NewMenuRepository(database)
 
-	PayslipUsecase = usecase.NewPayslipUsecase()
+	LedgerUsecase = usecase.NewLedgerUsecase(LedgerRepository)
 	MenuUsecase = usecase.NewMenuUsecase(MenuRepository)
+	PayslipUsecase = usecase.NewPayslipUsecase()
 }
 
 func initDatabase() {
