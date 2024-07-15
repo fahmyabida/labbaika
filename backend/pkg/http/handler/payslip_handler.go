@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"strings"
+
 	"github.com/fahmyabida/labbaika/internal/app/domain"
 	pkgErrors "github.com/fahmyabida/labbaika/pkg/errors"
 	"github.com/labstack/echo/v4"
@@ -28,10 +30,12 @@ func (h *PayslipHandler) ConvertCsvToDocx(c echo.Context) error {
 	}
 	defer src.Close()
 
+	fileName := strings.Replace(file.Filename, ".csv", ".docx", -1)
+
 	ctx := c.Request().Context()
-	fileName, err := h.PayslipUsecase.ConvertPayslip(ctx, src)
+	filePath, err := h.PayslipUsecase.ConvertPayslip(ctx, src)
 	if err != nil {
 		return err
 	}
-	return c.Attachment(fileName, fileName)
+	return c.Attachment(filePath, fileName)
 }

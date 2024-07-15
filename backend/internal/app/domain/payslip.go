@@ -6,5 +6,5 @@ import (
 )
 
 type IPayslipUsecase interface {
-	ConvertPayslip(c context.Context, file io.Reader) (fileName string, err error)
+	ConvertPayslip(c context.Context, file io.Reader) (filePath string, err error)
 }

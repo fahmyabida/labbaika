@@ -18,25 +18,26 @@ func NewPayslipUsecase() *PayslipUsecase {
 	return &PayslipUsecase{}
 }
 
-func (u *PayslipUsecase) ConvertPayslip(c context.Context, file io.Reader) (fileName string, err error) {
+func (u *PayslipUsecase) ConvertPayslip(c context.Context, file io.Reader) (filePath string, err error) {
 	csvReader := csv.NewReader(file)
 	records, err := csvReader.ReadAll()
 	if err != nil {
-		return fileName, err
+		return filePath, err
 	}
 
-	fileName = "file-" + time.Now().Format("200601021504059999999990700")
-	fileName = u.creatingNewDocx(records, fileName)
+	filePath = u.creatingNewDocx(records)
 
-	go func() {
-		time.Sleep(5 * time.Second)
-		os.Remove(fileName)
+	defer func() {
+		go func() {
+			time.Sleep(5 * time.Second)
+			os.Remove(filePath)
+		}()
 	}()
 
-	return fileName, nil
+	return filePath, nil
 }
 
-func (p *PayslipUsecase) creatingNewDocx(lines [][]string, fileName string) (newFileName string) {
+func (p *PayslipUsecase) creatingNewDocx(lines [][]string) (filePath string) {
 	doc := docx.NewFile()
 
 	for index, row := range lines {
@@ -70,7 +71,7 @@ func (p *PayslipUsecase) creatingNewDocx(lines [][]string, fileName string) (new
 		doc.AddParagraph()
 	}
 
-	newFileName = fmt.Sprintf("%v.docx", fileName)
-	doc.Save(newFileName)
-	return newFileName
+	filePath = fmt.Sprintf("./%v.docx", time.Now().Format("200601021504059999999990700"))
+	doc.Save(filePath)
+	return filePath
 }
