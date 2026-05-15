@@ -39,29 +39,36 @@ func InitStaticLogger(serviceName string) {
 }
 
 func Info(ctx context.Context, messageMap map[string]interface{}, message string) {
-	addTraceID(ctx, messageMap)
-	staticLogger.WithFields(messageMap).Info(message)
+	fields := buildFields(ctx, messageMap)
+	staticLogger.WithFields(fields).Info(message)
 }
 
 func Infof(ctx context.Context, messageMap map[string]interface{}, format string, message ...interface{}) {
-	addTraceID(ctx, messageMap)
-	staticLogger.WithFields(messageMap).Infof(format, message...)
+	fields := buildFields(ctx, messageMap)
+	staticLogger.WithFields(fields).Infof(format, message...)
 }
 
 func Error(ctx context.Context, messageMap map[string]interface{}, message string, err error) {
-	addTraceID(ctx, messageMap)
-	messageMap["error_message"] = err.Error()
-	staticLogger.WithFields(messageMap).Error(message)
-}
-
-func addTraceID(ctx context.Context, messageMap map[string]interface{}) {
-	traceID := ctx.Value(XTraceID)
-	initMessageMap(&messageMap)
-	messageMap["trace_id"] = fmt.Sprint(traceID)
-}
-
-func initMessageMap(messageMap *map[string]interface{}) {
-	if messageMap == nil {
-		messageMap = &map[string]interface{}{}
+	fields := buildFields(ctx, messageMap)
+	if err != nil {
+		fields["error_message"] = err.Error()
 	}
+	staticLogger.WithFields(fields).Error(message)
+}
+
+func Warn(ctx context.Context, messageMap map[string]interface{}, message string, err error) {
+	fields := buildFields(ctx, messageMap)
+	if err != nil {
+		fields["error_message"] = err.Error()
+	}
+	staticLogger.WithFields(fields).Warn(message)
+}
+
+func buildFields(ctx context.Context, messageMap map[string]interface{}) map[string]interface{} {
+	fields := map[string]interface{}{}
+	for k, v := range messageMap {
+		fields[k] = v
+	}
+	fields["trace_id"] = fmt.Sprint(ctx.Value(XTraceID))
+	return fields
 }
