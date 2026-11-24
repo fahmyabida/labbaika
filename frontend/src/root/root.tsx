@@ -7,8 +7,12 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import { DrawerPayslip } from './drawer';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { DrawerPayslip, PAGE_TITLES, PAGE_PATHS } from './drawer';
 import { ConvertCsv } from '../containers/ConvertCsv';
+import { CashbookPage } from '../containers/Cashbook';
+import { CategoryPage } from '../containers/Category';
+import { DashboardPage } from '../containers/Dashboard';
 
 const drawerWidth = 240;
 
@@ -20,13 +24,21 @@ interface Props {
   window?: () => Window;
 }
 
+const pathToTitle = (pathname: string): string => {
+  const entry = Object.entries(PAGE_PATHS).find(([, path]) => path === pathname);
+  return entry ? PAGE_TITLES[entry[0] as keyof typeof PAGE_TITLES] : 'Labbaika';
+};
+
 export default function ResponsiveDrawer(props: Props) {
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const location = useLocation();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
+
+  const pageTitle = pathToTitle(location.pathname);
 
   const container = window !== undefined ? () => window().document.body : undefined;
 
@@ -51,7 +63,7 @@ export default function ResponsiveDrawer(props: Props) {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            Convert CSV
+            {pageTitle}
           </Typography>
         </Toolbar>
       </AppBar>
@@ -74,7 +86,7 @@ export default function ResponsiveDrawer(props: Props) {
             '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
           }}
         >
-          <DrawerPayslip/>
+          <DrawerPayslip onNavigate={handleDrawerToggle} />
         </Drawer>
         <Drawer
           variant="permanent"
@@ -84,7 +96,7 @@ export default function ResponsiveDrawer(props: Props) {
           }}
           open
         >
-          <DrawerPayslip/>
+          <DrawerPayslip />
         </Drawer>
       </Box>
       <Box
@@ -92,7 +104,13 @@ export default function ResponsiveDrawer(props: Props) {
         sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
       >
         <Toolbar />
-        <ConvertCsv />
+        <Routes>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/cashbook" element={<CashbookPage />} />
+          <Route path="/category" element={<CategoryPage />} />
+          <Route path="/csv" element={<ConvertCsv />} />
+        </Routes>
       </Box>
     </Box>
   );

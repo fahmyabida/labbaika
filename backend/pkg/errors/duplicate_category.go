@@ -4,19 +4,19 @@ import (
 	"net/http"
 )
 
-type DuplicateLedgerError string
+type DuplicateCategoryError string
 
 // Error represents the error message
-func (e DuplicateLedgerError) Error() string {
+func (e DuplicateCategoryError) Error() string {
 	return string(e)
 }
 
 // ErrCode represents the Xendit error code
-func (e DuplicateLedgerError) ErrCode() string {
-	return DuplicateLedger
+func (e DuplicateCategoryError) ErrCode() string {
+	return DuplicateCategory
 }
 
 // StatusCode represents the HTTP status code
-func (e DuplicateLedgerError) StatusCode() int {
+func (e DuplicateCategoryError) StatusCode() int {
 	return http.StatusConflict
 }

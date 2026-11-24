@@ -1,12 +1,12 @@
 import axios from "axios";
-import { PAYSLIP_SERVICE_URL } from ".";
+import { BACKEND_URL } from ".";
 
 export async function UploadPayslipCsv(file: any)  {
     var formData = new FormData();
     formData.append("file", file);
     var result : any
     try {
-        result = await axios.post(`${PAYSLIP_SERVICE_URL}/api/v1/payslips/convert`, formData, {
+        result = await axios.post(`${BACKEND_URL}/api/v1/payslips/convert`, formData, {
             responseType: 'blob',
             headers: {
                 'Content-Type': 'multipart/form-data',

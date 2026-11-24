@@ -43,7 +43,7 @@ func (p *PayslipUsecase) creatingNewDocx(ctx context.Context, rows []dto.Payslip
 
 	for _, row := range rows {
 		if row.IsEmpty() {
-			logger.Warn(ctx, nil, "Empty data is skipped", nil)
+			logger.Warn(ctx, "Empty data is skipped", nil)
 			continue
 		}
 		para := doc.AddParagraph()
@@ -93,7 +93,7 @@ func (p *PayslipUsecase) creatingNewDocx(ctx context.Context, rows []dto.Payslip
 
 	filePath = fmt.Sprintf("./%v.docx", time.Now().Format("200601021504059999999990700"))
 	if err := doc.Save(filePath); err != nil {
-		logger.Error(ctx, nil, "Failed to save docx file", err)
+		logger.Error(ctx, "Failed to save docx file", err)
 		return filePath
 	}
 	return filePath

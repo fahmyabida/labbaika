@@ -2,9 +2,9 @@ package errors
 
 // nolint
 const (
-	ErrFileNotFound    = "file is not found"
-	ErrMenuNotFound    = "menu is not found"
-	ErrDuplicateMenu   = "menu is duplicated"
-	ErrLedgerNotFound  = "ledger is not found"
-	ErrDuplicateLedger = "ledger is duplicated"
+	ErrFileNotFound      = "file is not found"
+	ErrCashbookNotFound  = "cashbook is not found"
+	ErrDuplicateCashbook = "cashbook is duplicated"
+	ErrCategoryNotFound  = "category is not found"
+	ErrDuplicateCategory = "category already exists"
 )

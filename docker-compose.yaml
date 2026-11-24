@@ -1,16 +1,56 @@
 services:
   postgres:
-    image: postgres:latest
+    image: postgres:16-alpine
     container_name: postgres
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: labbaika
+      POSTGRES_USER: ${PG_USER:?set PG_USER in .env}
+      POSTGRES_PASSWORD: ${PG_PASSWORD:?set PG_PASSWORD in .env}
+      POSTGRES_DB: ${PG_DATABASE:?set PG_DATABASE in .env}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+    # No `ports:` on purpose. Publishing 5432 on a VPS exposes the database to
+    # the internet. Other services reach it over the compose network by DNS
+    # name. From your laptop, tunnel instead:
+    #   ssh -L 5432:localhost:5432 user@vps -N
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${PG_USER} -d ${PG_DATABASE}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [ "labbaika" ]
+
+  cashbook-svc:
+    container_name: cashbook-svc
+    build:
+      context: .
+      dockerfile: dockerfile.backend
+    restart: always
+    environment:
+      APP_ENV: production
+      PG_HOST: postgres
+      PG_PORT: 5432
+      PG_USER: ${PG_USER}
+      PG_PASSWORD: ${PG_PASSWORD}
+      PG_DATABASE: ${PG_DATABASE}
+      PG_RO_HOST: postgres
+      PG_RO_PORT: 5432
+      PG_RO_USER: ${PG_USER}
+      PG_RO_PASSWORD: ${PG_PASSWORD}
+      PG_RO_DATABASE: ${PG_DATABASE}
+      # 100 connections x 2 services would exhaust Postgres's default 100 cap
+      # and OOM a 1GB box: each connection is a separate OS process.
+      PG_DB_MAX_OPEN_CONNECTION: 20
+      PG_RO_DB_MAX_OPEN_CONNECTION: 20
+    volumes:
+      # Receipts are written to the container filesystem, which is discarded on
+      # every rebuild. Without this volume, uploaded files vanish while
+      # cashbooks.receipt_path still points at them.
+      - receipts:/root/uploads/receipts
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: [ "./labbaika", "cashbook-svc" ]
     networks: [ "labbaika" ]
 
   payslip-svc:
@@ -18,23 +58,9 @@ services:
     build:
       context: .
       dockerfile: dockerfile.backend
-    ports: [ 8080:8080 ]
-    volumes:
-      - ./docs:/root/docs
+    restart: always
     environment:
       APP_ENV: production
-      PG_HOST: postgres
-      PG_PORT: 5432
-      PG_USER: postgres
-      PG_PASSWORD: postgres
-      PG_DATABASE: labbaika
-      PG_RO_HOST: postgres
-      PG_RO_PORT: 5432
-      PG_RO_USER: postgres
-      PG_RO_PASSWORD: postgres
-      PG_RO_DATABASE: labbaika
-    depends_on:
-      - postgres
     command: [ "./labbaika", "payslip-svc" ]
     networks: [ "labbaika" ]
 
@@ -42,11 +68,17 @@ services:
     build:
       context: .
       dockerfile: dockerfile.frontend
+      args:
+        # Empty = same-origin. The browser calls /api/... on this nginx, which
+        # proxies to the Go services. No CORS, no mixed content under HTTPS.
+        REACT_APP_BACKEND_URL: ""
     container_name: frontend
-    environment:
-      APP_ENV: production
+    restart: always
     ports:
-      - 3000:3000
+      - "80:80"
+    depends_on:
+      - cashbook-svc
+      - payslip-svc
     networks: [ "labbaika" ]
 
 networks:
@@ -55,3 +87,4 @@ networks:
 
 volumes:
   postgres_data:
+  receipts:

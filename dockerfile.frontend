@@ -1,13 +1,24 @@
-FROM node:18-alpine
+# Stage 1: produce the static bundle.
+FROM node:18-alpine AS builder
 WORKDIR /app
 
-ENV PATH /app/node_modules/.bin:$PATH
+COPY frontend/package.json frontend/package-lock.json ./
+# npm ci honours the lockfile exactly; npm install can silently drift.
+RUN npm ci --silent
 
-COPY ./frontend/package.json ./
-COPY ./frontend/package-lock.json ./
-RUN npm install --silent
-RUN npm install react-scripts@3.4.1 -g --silent
+COPY frontend/ ./
 
-COPY ./frontend ./
+# REACT_APP_* vars are inlined at build time, not read at runtime, so the API
+# base URL has to be known here. Empty means same-origin, which the nginx
+# stage below proxies to the Go services.
+ARG REACT_APP_BACKEND_URL=""
+ENV REACT_APP_BACKEND_URL=$REACT_APP_BACKEND_URL
+# Source maps would publish readable source to anyone opening devtools.
+ENV GENERATE_SOURCEMAP=false
+RUN npm run build
 
-CMD ["npm", "run", "start"]
+# Stage 2: serve it. ~10MB RSS instead of ~400MB for the CRA dev server.
+FROM nginx:alpine
+COPY --from=builder /app/build /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 80

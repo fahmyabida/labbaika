@@ -43,12 +43,11 @@ func handledEchoError(c echo.Context, err *echo.HTTPError) error {
 	message := err.Message
 
 	if err.Code == http.StatusInternalServerError {
-		logger.Error(c.Request().Context(), map[string]interface{}{
-			"method":        c.Request().Method,
-			"uri":           c.Request().RequestURI,
-			"error_code":    errCode,
-			"error_message": message,
-		}, "http error", err)
+		logger.Error(c.Request().Context(), "http error", err, logger.Fields{
+			"method":     c.Request().Method,
+			"uri":        c.Request().RequestURI,
+			"error_code": errCode,
+		})
 
 		errCode = httpStatusCodeToErrorCode(http.StatusInternalServerError)
 		message = DefaultErrorMessage
@@ -65,12 +64,11 @@ func handledError(c echo.Context, err errors.ServiceError) error {
 	message := err.Error()
 
 	if err.StatusCode() == http.StatusInternalServerError {
-		logger.Error(c.Request().Context(), map[string]interface{}{
-			"method":        c.Request().Method,
-			"uri":           c.Request().RequestURI,
-			"error_code":    errCode,
-			"error_message": message,
-		}, "http error", err)
+		logger.Error(c.Request().Context(), "http error", err, logger.Fields{
+			"method":     c.Request().Method,
+			"uri":        c.Request().RequestURI,
+			"error_code": errCode,
+		})
 
 		errCode = httpStatusCodeToErrorCode(http.StatusInternalServerError)
 		message = DefaultErrorMessage
@@ -84,7 +82,6 @@ func handledError(c echo.Context, err errors.ServiceError) error {
 
 func unhandledError(c echo.Context, err error) error {
 	var errCode string
-	message := err.Error()
 
 	// Check if err is a HTTP error (to assign the correct error_code in our logs if it is)
 	if httpErr, ok := err.(*echo.HTTPError); ok {
@@ -93,12 +90,11 @@ func unhandledError(c echo.Context, err error) error {
 		errCode = httpStatusCodeToErrorCode(http.StatusInternalServerError)
 	}
 
-	logger.Error(c.Request().Context(), map[string]interface{}{
-		"method":        c.Request().Method,
-		"uri":           c.Request().RequestURI,
-		"error_code":    errCode,
-		"error_message": message,
-	}, "http error", err)
+	logger.Error(c.Request().Context(), "http error", err, logger.Fields{
+		"method":     c.Request().Method,
+		"uri":        c.Request().RequestURI,
+		"error_code": errCode,
+	})
 
 	return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 		"error_code": httpStatusCodeToErrorCode(http.StatusInternalServerError),

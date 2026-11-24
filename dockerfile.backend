@@ -1,18 +1,18 @@
-# Start from a golang base image
-FROM golang:latest as builder
+# Build context is the repo root (see docker-compose.yaml), so every source
+# path here is prefixed with backend/.
+FROM golang:1.22-alpine AS builder
 
 WORKDIR /app
 
-COPY go.mod go.sum ./
-
+COPY backend/go.mod backend/go.sum ./
 RUN go mod download
 
-COPY . .
+COPY backend/ ./
 
-# RUN make build
-RUN CGO_ENABLED=0 make build
+# Static binary: the alpine runtime stage has no libc to link against.
+RUN CGO_ENABLED=0 go build -o labbaika ./cmd/
 
-FROM alpine:latest  
+FROM alpine:latest
 
 RUN apk --no-cache add ca-certificates
 
@@ -20,4 +20,6 @@ WORKDIR /root/
 
 COPY --from=builder /app/labbaika .
 
-CMD ["./labbaika payslip-svc"]
+# Exec form takes one argv element per token. The old single-string version
+# looked for a binary literally named "labbaika payslip-svc".
+CMD ["./labbaika", "cashbook-svc"]

@@ -9,17 +9,17 @@ import (
 	customMiddleware "github.com/fahmyabida/labbaika/pkg/http/middleware"
 )
 
-var ledgerSvc = &cobra.Command{
-	Use:   "ledger-svc",
-	Short: "This is rest server for labbaika-ledger",
-	Run:   RunLedgerService,
+var cashbookSvc = &cobra.Command{
+	Use:   "cashbook-svc",
+	Short: "This is rest server for labbaika-cashbook",
+	Run:   RunCashbookService,
 }
 
 func init() {
-	rootCmd.AddCommand(ledgerSvc)
+	rootCmd.AddCommand(cashbookSvc)
 }
 
-func RunLedgerService(cmd *cobra.Command, args []string) {
+func RunCashbookService(cmd *cobra.Command, args []string) {
 	e := echo.New()
 
 	e.Use(
@@ -40,9 +40,12 @@ func RunLedgerService(cmd *cobra.Command, args []string) {
 		}),
 	)
 
+	e.Static("/receipts", "uploads/receipts")
+
 	v1 := e.Group("/api/v1")
 
-	httpHandler.InitLedgerHandler(v1, LedgerUsecase)
+	httpHandler.InitCashbookHandler(v1, CashbookUsecase)
+	httpHandler.InitCategoryHandler(v1, CategoryUsecase)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }

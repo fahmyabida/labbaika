@@ -1,2 +1,11 @@
 .omc
-~/backend/.omc
+.DS_Store
+
+# Secrets. Never commit; .env.example documents the shape instead.
+.env
+.env.*
+!.env.example
+
+backend/uploads/
+frontend/node_modules/
+frontend/build/

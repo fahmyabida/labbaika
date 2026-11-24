@@ -1,9 +1,10 @@
 package errors
 
 const (
-	FileNotFound    = "FILE_NOT_FOUND"
-	MenuNotFound    = "MENU_NOT_FOUND"
-	DuplicateMenu   = "DUPLICATE_MENU"
-	LedgerNotFound  = "LEDGER_NOT_FOUND"
-	DuplicateLedger = "DUPLICATE_LEDGER"
+	FileNotFound      = "FILE_NOT_FOUND"
+	CashbookNotFound  = "CASHBOOK_NOT_FOUND"
+	DuplicateCashbook = "DUPLICATE_CASHBOOK"
+	CategoryNotFound  = "CATEGORY_NOT_FOUND"
+	DuplicateCategory = "DUPLICATE_CATEGORY"
+	InvalidInput      = "INVALID_INPUT"
 )

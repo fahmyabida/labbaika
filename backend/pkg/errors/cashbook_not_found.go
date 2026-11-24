@@ -4,19 +4,19 @@ import (
 	"net/http"
 )
 
-type MenuNotFoundError string
+type CashbookNotFoundError string
 
 // Error represents the error message
-func (e MenuNotFoundError) Error() string {
+func (e CashbookNotFoundError) Error() string {
 	return string(e)
 }
 
 // ErrCode represents the Xendit error code
-func (e MenuNotFoundError) ErrCode() string {
-	return MenuNotFound
+func (e CashbookNotFoundError) ErrCode() string {
+	return CashbookNotFound
 }
 
 // StatusCode represents the HTTP status code
-func (e MenuNotFoundError) StatusCode() int {
+func (e CashbookNotFoundError) StatusCode() int {
 	return http.StatusBadRequest
 }

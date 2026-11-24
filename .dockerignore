@@ -1,0 +1,17 @@
+# node_modules is ~300MB and gets rebuilt by npm ci inside the image anyway.
+# Without this it is uploaded to the Docker daemon on every build.
+**/node_modules
+**/build
+**/dist
+
+.git
+.omc
+.vscode
+.DS_Store
+
+# Never bake secrets into an image layer.
+**/.env
+**/.env.*
+!**/.env.example
+
+backend/uploads

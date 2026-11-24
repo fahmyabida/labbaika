@@ -4,19 +4,19 @@ import (
 	"net/http"
 )
 
-type LedgerNotFoundError string
+type CategoryNotFoundError string
 
 // Error represents the error message
-func (e LedgerNotFoundError) Error() string {
+func (e CategoryNotFoundError) Error() string {
 	return string(e)
 }
 
 // ErrCode represents the Xendit error code
-func (e LedgerNotFoundError) ErrCode() string {
-	return LedgerNotFound
+func (e CategoryNotFoundError) ErrCode() string {
+	return CategoryNotFound
 }
 
 // StatusCode represents the HTTP status code
-func (e LedgerNotFoundError) StatusCode() int {
+func (e CategoryNotFoundError) StatusCode() int {
 	return http.StatusBadRequest
 }

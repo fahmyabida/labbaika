@@ -32,13 +32,13 @@ var (
 	database *gorm.DB
 
 	// repository
-	LedgerRepository domain.ILedgerRepo
-	MenuRepository   domain.IMenuRepo
+	CashbookRepository domain.ICashbookRepo
+	CategoryRepository domain.ICategoryRepo
 
 	// usecase
-	LedgerUsecase  domain.ILedgerUsecase
-	MenuUsecase    domain.IMenuUsecase
-	PayslipUsecase domain.IPayslipUsecase
+	CashbookUsecase domain.ICashbookUsecase
+	CategoryUsecase domain.ICategoryUsecase
+	PayslipUsecase  domain.IPayslipUsecase
 )
 
 func init() {
@@ -47,18 +47,24 @@ func init() {
 		log.Fatal(err)
 	}
 
-	cobra.OnInitialize(func() {
-		// initDatabase()
-		initApp()
-	})
+	cobra.OnInitialize(initApp)
 }
 
-func initApp() {
-	MenuRepository = repository.NewMenuRepository(database)
+// noDBCommands are services that must boot without Postgres.
+var noDBCommands = map[string]bool{"payslip-svc": true}
 
-	LedgerUsecase = usecase.NewLedgerUsecase(LedgerRepository)
-	MenuUsecase = usecase.NewMenuUsecase(MenuRepository)
+func initApp() {
 	PayslipUsecase = usecase.NewPayslipUsecase()
+	if len(os.Args) > 1 && noDBCommands[os.Args[1]] {
+		return
+	}
+
+	initDatabase()
+	CashbookRepository = repository.NewCashbookRepository(database)
+	CategoryRepository = repository.NewCategoryRepository(database)
+
+	CashbookUsecase = usecase.NewCashbookUsecase(CashbookRepository, CategoryRepository)
+	CategoryUsecase = usecase.NewCategoryUsecase(CategoryRepository)
 }
 
 func initDatabase() {
